@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>界面操作练习</title>
+    <style>
+        /* 保留原有链接样式，仅添加悬停效果 */
+        a[name='link2byhy'] {
+            color: #0c69c7; /* 默认蓝色 */
+            text-decoration: none;
+            transition: all 0.3s ease; /* 平滑过渡效果 */
+        }
+        a[name='link2byhy']:hover {
+            color: #ff6600; /* 悬停时变为橙色 */
+            text-decoration: underline; /* 添加下划线 */
+            transform: scale(1.05); /* 轻微放大 */
+        }
+    </style>
+</head>
+
+<body>
+    <exercise>
+        <!-- 搜索框（保留原始type="search"） -->
+        <input type="search">
+
+        <br>
+        <!-- 进度条（保留value/max属性和内部文本） -->
+        <progress value="75" max="100">75 %</progress>
+
+        <br>
+        <!-- 提示框（保留class和role） -->
+        <div class="alert-message" role="alert">
+            您已成功注册，很快您将收到一封确认电子邮件
+        </div>
+
+        <br>
+        <!-- 链接（保留name和href） -->
+        <a name='link2byhy' href="https://www.byhy.net"> 白月黑羽教程</a>
+        
+        <br>
+        <!-- 输入框组（保留aria-label和id关联） -->
+        <input aria-label="Username">
+        <label for="password-input">Password:</label>
+        <input id="password-input">
+        
+        <br>
+        <!-- 原始文本容器（保留id和嵌套结构） -->
+        <p id="source">
+            <span id='text'>看一下<br>这个内容<br>如何变化</span>
+            <span style="display:none">隐藏内容</span>
+        </p>
+        
+        <!-- 动态内容容器（保留原始id和脚本逻辑） -->
+        <div id="temp">初始内容（3秒后将被替换）</div>
+        
+        <br>
+        <!-- 文件上传（保留原始id和事件监听） -->
+        <input type="file" id="fileInput">
+    </exercise>
+
+    <selectbox>
+    <br>
+        <!-- 单选/多选组（保留所有name/id/checked属性） -->
+        <h4>单选（Radio）</h4>
+        <input type="radio" name="gender" id="male" checked>
+        <label for="male">男</label>
+        <input type="radio" name="gender" id="female">
+        <label for="female">女</label>
+        <input type="radio" name="gender" id="zandouji">
+        <label for="zandouji">战斗机</label>
+        
+        <h4>多选（Checkbox）</h4>
+        <input type="checkbox" id="music">
+        <label for="music">音乐</label>
+        <input type="checkbox" id="sports">
+        <label for="sports">运动</label>
+        <input type="checkbox" id="read">
+        <label for="read">读书</label>
+
+        <h4>下拉菜单（Select）</h4>
+        <select id="select">
+            <option value="option1">选项1</option>
+            <option value="option2">选项2</option>
+            <option value="option3">选项3</option>
+        </select>
+
+        <!-- 基础多选（按住Ctrl/Command键选择） -->
+         <h4>多选下拉菜单（Select）</h4>
+        <select id="hobbies" multiple>
+            <option value="music">音乐</option>
+            <option value="sports">运动</option>
+            <option value="reading">阅读</option>
+        </select>
+
+
+    </selectbox>
+
+    <br>
+    <h4>拖拽（drag_to）</h4>
+    <span id="t1">t1</span>
+    <span id="t2">t2</span> 
+    <form >
+        <div id="captcha">
+        </div>
+        <input type="text" placeholder="captcha" />
+        <button type="submit">Submit</button>
+    </form>
+
+    
+ 
+
+    <script>
+        document.addEventListener('DOMContentLoaded',  function() {
+            const tempElement = document.getElementById('temp');  
+            const currentDate = '2025年9月1日 星期一 11:22 (农历七月初十)';
+            
+            if (tempElement) {
+                setTimeout(() => {
+                    tempElement.innerHTML  = `
+                        <div class="dynamic-content">
+                            <p>当前时间：<strong>${currentDate}</strong></p>
+                        </div>
+                    `;
+                }, 3000);
+            } else {
+                console.warn(' 未找到ID为temp的元素');
+            }
+            
+            document.getElementById('fileInput').addEventListener('change',  function(e) {
+                console.log(" 选中文件:", e.target.files[0]);  
+            });
+        });
+    </script>
+</body>
+</html>

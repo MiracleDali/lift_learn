@@ -29,7 +29,6 @@ def send_message(name):
 
 @cel.task
 def send_email(name):
-    kl
     print(f'向{name}发送邮件...')
     time.sleep(5)
     print(f'向{name}发送邮件成功')

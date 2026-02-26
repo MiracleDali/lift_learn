@@ -1,6 +1,8 @@
 
+"""
+生产者
+"""
 from celery_task import send_email, send_message
-
 
 result = send_email.delay('张三')
 print(result.id)

@@ -1,3 +1,6 @@
+"""
+celery任务结果查询
+"""
 
 from celery.result import AsyncResult
 from celery_task import cel

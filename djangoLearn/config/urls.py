@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from sales import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 ] + [
     # 链接 子路由
-    path('sales/', include('sales.urls'), name='sales')
+    # path('sales/', include('sales.urls'), name='sales')
+] + [
+    path('sales/listorders', views.listorders, name='listorders'),
+    path('sales/listcustomers/', views.listcustomers, name='listcustomers')
 ]

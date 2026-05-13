@@ -58,6 +58,9 @@ class CustomerAdmin(admin.ModelAdmin):
     # 日期层级筛选
     date_hierarchy = 'created_date'  # 日期字段
 
+    # 默认空值
+    empty_value_display = 'NA'
+
     # 列表页字段排序
     ordering = ['id']
 

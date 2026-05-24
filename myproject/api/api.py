@@ -3,11 +3,18 @@ from .models import Task
 from .schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema
 from django.shortcuts import get_object_or_404
 from typing import List
+from ninja.security import HttpBearer
 
+
+# 定义认证类（与urls.py保持一致）
+class AuthBearer(HttpBearer):
+    def authenticate(self, request, token):
+        if token == "supersecret":
+            return token
 router = Router()
 
 # 获取任务列表
-@router.get("/tasks", response=list[TaskSchema])
+@router.get("/tasks", response=list[TaskSchema], auth=AuthBearer())
 def list_tasks(request):
     return Task.objects.all()
 

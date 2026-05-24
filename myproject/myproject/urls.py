@@ -19,6 +19,7 @@ from django.urls import path
 from ninja import NinjaAPI
 from api.api import router as api_router   # 导入我们的 router
 from ninja.security import HttpBearer
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 class AuthBearer(HttpBearer):
     def authenticate(self, request, token):
@@ -31,4 +32,4 @@ api.add_router("/", api_router)             # 将所有任务路由挂载到 /ap
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
-]
+] + debug_toolbar_urls()

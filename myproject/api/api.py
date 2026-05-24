@@ -1,6 +1,8 @@
 from ninja import Router
 from .models import Task
 from .schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema
+from django.shortcuts import get_object_or_404
+from typing import List
 
 router = Router()
 
@@ -24,7 +26,7 @@ def create_task(request, payload: TaskCreateSchema):
 # 更新任务
 @router.put("/tasks/{task_id}", response=TaskSchema)
 def update_task(request, task_id: int, payload: TaskUpdateSchema):
-    task = Task.objects.get(id=task_id)
+    task = get_object_or_404(Task, id=task_id)
     for attr, value in payload.dict(exclude_unset=True).items():
         setattr(task, attr, value)
     task.save()

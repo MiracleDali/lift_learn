@@ -25,7 +25,7 @@ class AuthBearer(HttpBearer):
         if token == "supersecret":
             return token
 
-api = NinjaAPI(auth=AuthBearer())
+api = NinjaAPI(auth=AuthBearer())    # 启用认证
 api.add_router("/", api_router)             # 将所有任务路由挂载到 /api/ 下
 
 urlpatterns = [

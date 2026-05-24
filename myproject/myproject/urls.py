@@ -1,5 +1,5 @@
 """
-URL configuration for mysite project.
+URL configuration for myproject project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
@@ -15,9 +15,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from ninja import NinjaAPI
+from api.api import router as api_router   # 导入我们的 router
+from ninja.security import HttpBearer
+
+class AuthBearer(HttpBearer):
+    def authenticate(self, request, token):
+        if token == "supersecret":
+            return token
+
+api = NinjaAPI(auth=AuthBearer())
+api.add_router("/", api_router)             # 将所有任务路由挂载到 /api/ 下
 
 urlpatterns = [
-    path("polls/", include("polls.urls")),  # 所有以 "polls/" 开头的 URL 都转发给 polls.urls 处理
     path('admin/', admin.site.urls),
+    path('api/', api.urls),
 ]

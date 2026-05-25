@@ -1,47 +1,29 @@
 from ninja import Router
+from ninja_jwt.authentication import JWTAuth
 from .models import Task
 from .schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema
-from django.shortcuts import get_object_or_404
-from typing import List
-from ninja.security import HttpBearer
 
-
-# 定义认证类（与urls.py保持一致）
-class AuthBearer(HttpBearer):
-    def authenticate(self, request, token):
-        if token == "supersecret":
-            return token
 router = Router()
 
-# 获取任务列表
-@router.get("/tasks", response=list[TaskSchema], auth=AuthBearer())
+# 公开接口：无需登录即可查看
+@router.get("/tasks", response=list[TaskSchema])
 def list_tasks(request):
     return Task.objects.all()
 
-# 获取单个任务
-@router.get("/tasks/{task_id}", response=TaskSchema)
-def get_task(request, task_id: int):
-    task = Task.objects.get(id=task_id)
-    return task
-
-# 创建任务
-@router.post("/tasks", response=TaskSchema)
+# 受保护接口：必须携带有效的 Bearer Token
+@router.post("/tasks", response=TaskSchema, auth=JWTAuth())
 def create_task(request, payload: TaskCreateSchema):
-    task = Task.objects.create(**payload.dict())
-    return task
+    return Task.objects.create(**payload.dict())
 
-# 更新任务
-@router.put("/tasks/{task_id}", response=TaskSchema)
+@router.put("/tasks/{task_id}", response=TaskSchema, auth=JWTAuth())
 def update_task(request, task_id: int, payload: TaskUpdateSchema):
-    task = get_object_or_404(Task, id=task_id)
+    task = Task.objects.get(id=task_id)
     for attr, value in payload.dict(exclude_unset=True).items():
         setattr(task, attr, value)
     task.save()
     return task
 
-# 删除任务
-@router.delete("/tasks/{task_id}")
+@router.delete("/tasks/{task_id}", auth=JWTAuth())
 def delete_task(request, task_id: int):
-    task = Task.objects.get(id=task_id)
-    task.delete()
+    Task.objects.get(id=task_id).delete()
     return {"success": True}

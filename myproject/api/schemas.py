@@ -1,16 +1,17 @@
 from ninja import Schema
-from datetime import datetime
+from typing import Optional
+from datetime import datetime  # 1. 导入 datetime
 
 class TaskSchema(Schema):
     id: int
     title: str
     completed: bool
-    created_at: datetime
+    created_at: datetime  
 
 class TaskCreateSchema(Schema):
     title: str
-    completed: bool = False
+    completed: Optional[bool] = False
 
 class TaskUpdateSchema(Schema):
-    title: str = None
-    completed: bool = None
+    title: Optional[str] = None
+    completed: Optional[bool] = None

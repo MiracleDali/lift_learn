@@ -1,5 +1,5 @@
 """
-URL configuration for myproject project.
+URL configuration for config project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
@@ -17,19 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ninja import NinjaAPI
-from api.api import router as api_router   # 导入我们的 router
-from ninja.security import HttpBearer
-from debug_toolbar.toolbar import debug_toolbar_urls
+from api.api import router as api_router
+from ninja_jwt.routers.obtain import obtain_pair_router # 导入自带的路由器
 
-class AuthBearer(HttpBearer):
-    def authenticate(self, request, token):
-        if token == "supersecret":
-            return token
 
-api = NinjaAPI(auth=AuthBearer())    # 启用认证
-api.add_router("/", api_router)             # 将所有任务路由挂载到 /api/ 下
+api = NinjaAPI()
+api.add_router("/", api_router)             # 业务接口
+api.add_router("/auth", obtain_pair_router) # 登录/刷新接口
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
-] + debug_toolbar_urls()
+]

@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6hd@bx01keirrq2020=l^i5a8g%-c5lxan*=rp&(a0x%jct8)a'
+SECRET_KEY = 'django-insecure-_p$)kl^3skf3ap10pl8l$7!bp#@i#le=au(b=q33kym!a-3=fn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,16 +40,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'ninja_jwt',  # JWT 鉴权核心
+    'ninja_extra', # 用基于类的方式组织 Django Ninja 代码，并提供权限控制、依赖注入等高级特性，便于管理复杂 API。
+    "debug_toolbar"  # Django Debug Toolbar
 ]
 
-
 NINJA_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # （访问令牌有效期）
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),       # （刷新令牌有效期）
+    'ALGORITHM': 'HS256',                              # （算法）
+    'SIGNING_KEY': SECRET_KEY,                         # （签名密钥）
+    'AUTH_HEADER_TYPES': ('Bearer',),                  #  (认证头类型)
 }
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -59,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -114,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'UTC'
 

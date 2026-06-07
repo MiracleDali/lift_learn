@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_p$)kl^3skf3ap10pl8l$7!bp#@i#le=au(b=q33kym!a-3=fn'
+SECRET_KEY = 'django-insecure-s8y+59oe_-a18d+*bhn+bc)r30)4aa5om3^ud5!fh5a=zeo#w$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]   
 
 
 # Application definition
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'api',
     'ninja_jwt',  # JWT 鉴权核心
     'ninja_extra', # 用基于类的方式组织 Django Ninja 代码，并提供权限控制、依赖注入等高级特性，便于管理复杂 API。
-    "debug_toolbar"  # Django Debug Toolbar
+    # "debug_toolbar"  # Django Debug Toolbar
 ]
 
 NINJA_JWT = {
@@ -52,11 +52,6 @@ NINJA_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),                  #  (认证头类型)
 }
 
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -66,7 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'config.middleware.LogUserContextMiddleware',  # ← 添加这一行
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -124,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -135,3 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+from .loguru_config import setup_loguru
+setup_loguru()

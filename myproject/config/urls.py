@@ -16,16 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ninja_extra import NinjaExtraAPI
+from ninja_extra import NinjaExtraAPI       # 基于类的方式
+# from ninja import NinjaAPI          # 基于函数的方式
 from ninja_jwt.controller import NinjaJWTDefaultController
 from api.api import router as api_router
-from debug_toolbar.toolbar import debug_toolbar_urls
 
-api = NinjaExtraAPI()
+api = NinjaExtraAPI()   # 基于类的方式
 api.register_controllers(NinjaJWTDefaultController)
-api.add_router("", api_router)
+api.add_router('', api_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
-] + debug_toolbar_urls()
+]

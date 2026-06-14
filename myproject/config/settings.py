@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s8y+59oe_-a18d+*bhn+bc)r30)4aa5om3^ud5!fh5a=zeo#w$'
+SECRET_KEY = 'django-insecure-fnnd^4lz+1&+8!v&5x8_efarp#a#zgf)4s2+-)qggio-0ud*%c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]   
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -39,19 +39,29 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'users',
     'ninja_jwt',  # JWT 鉴权核心
     'ninja_extra', # 用基于类的方式组织 Django Ninja 代码，并提供权限控制、依赖注入等高级特性，便于管理复杂 API。
     # "debug_toolbar"  # Django Debug Toolbar
 ]
 
-NINJA_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),    # （访问令牌有效期）
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),       # （刷新令牌有效期）
-    'ALGORITHM': 'HS256',                              # （算法）
-    'SIGNING_KEY': SECRET_KEY,                         # （签名密钥）
-    'AUTH_HEADER_TYPES': ('Bearer',),                  #  (认证头类型)
-}
 
+NINJA_JWT = {
+    # Token 有效期
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    # 签名设置
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    # 认证头
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    # 用户标识
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    # 刷新行为
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -118,7 +128,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = 'zh-hans'
-
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True

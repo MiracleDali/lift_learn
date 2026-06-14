@@ -20,12 +20,21 @@ from ninja_extra import NinjaExtraAPI       # 基于类的方式
 # from ninja import NinjaAPI          # 基于函数的方式
 from ninja_jwt.controller import NinjaJWTDefaultController
 from api.api import router as api_router
+from users.api import router as auth_router
+from ninja_jwt.authentication import JWTAuth
 
-api = NinjaExtraAPI()   # 基于类的方式
+api = NinjaExtraAPI(
+    docs_url="/docs",
+    title="My Project API",
+    description="Test Api for My Project frontend - documentation",
+    version="1.0.0",
+    auth=JWTAuth(),
+)   # 基于类的方式
 api.register_controllers(NinjaJWTDefaultController)
-api.add_router('', api_router)
+api.add_router('api', api_router)           # 业务路由（无前缀）
+api.add_router('auth', auth_router)          # 认证路由（有前缀）
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', api.urls),
+    path('', api.urls),  # 业务接口 
 ]

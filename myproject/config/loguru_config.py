@@ -79,8 +79,8 @@ def setup_loguru():
     # - 使用 ANSI 颜色标记，控制台会自动着色
     LOG_FORMAT = (
         "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "  # 绿色时间，精确到毫秒
-        "<level>{level: <6}</level> | "                      # 级别（根据级别自动着色），占8字符
-        "<yellow>{extra[username]: <9}</yellow> | "        # 黄色用户名，占12字符
+        "<level>{level: <8}</level> | "                      # 级别（根据级别自动着色），占8字符
+        "<yellow>{extra[username]: <12}</yellow> | "        # 黄色用户名，占12字符
         "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "  # 青色文件函数行号
         "<level>{message}</level>"                           # 消息（级别颜色）
     )
@@ -117,7 +117,7 @@ def setup_loguru():
             rotation="00:00",            # 轮转时机：每天零点创建新文件
             retention="30 days",         # 保留时间：30天，自动删除旧文件
             compression="zip",           # 轮转后自动压缩旧文件为 zip，节省空间
-            level="DEBUG",                # 文件只记录 INFO 及以上级别，避免太大
+            level="INFO",                # 文件只记录 INFO 及以上级别，避免太大
             encoding="utf-8",            # 编码 UTF-8，支持中文
             enqueue=True,                # 异步写入，线程安全
             backtrace=True,              # 异常栈完整

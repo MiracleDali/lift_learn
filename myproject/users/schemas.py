@@ -79,3 +79,17 @@ class LoginResponse(Schema):
     username: Optional[str] = None
     email: Optional[str] = None
     groups: Optional[List[str]] = None
+
+################################################################################
+# 登出请求体
+class LogoutRequest(Schema):
+    """
+    用户登出请求的数据结构。
+    - success: 固定为 False
+    - message: 详情
+    """
+    success: bool = False
+    message: str
+
+    
+   

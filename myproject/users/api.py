@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from loguru import logger
-from .schemas import RegisterRequest, RegisterResponse, ErrorResponse, LoginResponse, LoginRequest
+from .schemas import (RegisterRequest, RegisterResponse, ErrorResponse, LoginResponse, LoginRequest, LogoutRequest)
 
 # 创建一个 Router 实例，用于注册接口
 router = Router()
@@ -124,6 +124,31 @@ def login(request, payload: LoginRequest):
         "groups": [group.name for group in user.groups.all()]
     }
 
+
+@router.post("/logout", response={200: LogoutRequest})
+def logout(request):
+    """
+    用户注销接口。
+    
+    说明：
+    - JWT 是无状态的，注销主要由前端删除 token 实现
+    - 此接口记录注销日志并返回成功响应
+    - 如果用户已认证，会记录用户名
+    """
+    # 尝试获取当前用户信息（如果有认证的话）
+    username = "匿名用户"
+    if hasattr(request, "user") and request.user.is_authenticated:
+        username = request.user.username
+    
+    # 记录注销日志
+    logger.info(f"用户登出：用户名={username}")
+    
+    # 返回成功响应
+    return 200, {
+        "success": True,
+        "message": "登出成功，请在前端清除 token"
+    }
+    
 
 @router.get("/me", response=RegisterResponse)
 def me(request):

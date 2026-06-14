@@ -16,9 +16,9 @@
 
 from loguru import logger
 from django.contrib.auth import get_user_model
+from config.loguru_config import request_username, request_client_ip  
+from django.contrib.auth.models import User
 
-# 获取用户模型（支持自定义用户模型）
-User = get_user_model()
 
 
 class LogUserContextMiddleware:
@@ -40,6 +40,22 @@ class LogUserContextMiddleware:
             get_response: 下一个中间件或视图的可调用对象
         """
         self.get_response = get_response
+
+    def _get_client_ip(self, request):
+        # 优先从 X-Forwarded-For 获取（多层代理场景）
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0].strip()
+            if ip:
+                return ip
+
+        # 其次从 X-Real-IP 获取
+        x_real_ip = request.META.get("HTTP_X_REAL_IP", "")
+        if x_real_ip:
+            return x_real_ip.strip()
+
+        # 最后使用 REMOTE_ADDR
+        return request.META.get("REMOTE_ADDR", "unknown")
 
     def __call__(self, request):
         """
@@ -78,10 +94,15 @@ class LogUserContextMiddleware:
                     # token 无效或用户不存在，保持 anonymous
                     pass
 
-        # ------------- 绑定用户名到上下文，处理请求 -------------
-        # 使用 Loguru 原生 contextualize，自动线程隔离
-        # with 块退出自动清理，不会影响下一个请求
-        with logger.contextualize(username=username):
+        # 获取客户端IP地址
+        client_ip = self._get_client_ip(request)
+
+        # 绑定到 contextvars（关键！）
+        request_username.set(username)
+        request_client_ip.set(client_ip)
+
+        # 绑定到 Loguru 上下文
+        with logger.contextualize(username=username, client_ip=client_ip):
             # 调用后续处理链
             response = self.get_response(request)
 

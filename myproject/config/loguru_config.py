@@ -16,8 +16,19 @@ Loguru 集成配置模块。
 
 import logging
 import sys
+import contextvars
 from pathlib import Path
 from loguru import logger
+
+# 定义 contextvars 用于跨上下文传递
+request_username = contextvars.ContextVar("request_username", default="system")
+request_client_ip = contextvars.ContextVar("request_client_ip", default="system")
+
+def is_url_log(record):
+    """判断是否是请求URL日志（通常由uvicorn记录）"""
+    message = record["message"]
+    # URL日志通常包含 HTTP 方法和状态码
+    return any(method in message for method in ("GET ", "POST ", "PUT ", "DELETE ", "PATCH "))
 
 
 class InterceptHandler(logging.Handler):
@@ -54,10 +65,15 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        # 转发给 Loguru，原生 logging 日志默认用 system 用户名
-        logger.opt(depth=depth, exception=record.exc_info).bind(username="system").log(
-            level, record.getMessage()
-        )
+        # 从 contextvars 获取（优先），如果没有则用默认值
+        username = request_username.get("system")
+        client_ip = request_client_ip.get("system")
+
+        # 转发给 Loguru
+        logger.opt(depth=depth, exception=record.exc_info).bind(
+            username=username, 
+            client_ip=client_ip
+        ).log(level, record.getMessage())
 
 
 def setup_loguru():
@@ -78,9 +94,9 @@ def setup_loguru():
     # - 用户名固定占 12 个字符宽度，保证对齐
     # - 使用 ANSI 颜色标记，控制台会自动着色
     LOG_FORMAT = (
-        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "  # 绿色时间，精确到毫秒
-        "<level>{level: <8}</level> | "                      # 级别（根据级别自动着色），占8字符
-        "<yellow>{extra[username]: <12}</yellow> | "        # 黄色用户名，占12字符
+        "<green>{time:YY-MM-DD HH:mm:ss.SS}</green> | "  # 绿色时间，精确到毫秒
+        "<level>{level: <5}</level> | "                      # 级别（根据级别自动着色），占8字符
+        "<magenta>{extra[client_ip]}</magenta>:<yellow>{extra[username]: <10}</yellow> | "        # IP:用户名
         "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "  # 青色文件函数行号
         "<level>{message}</level>"                           # 消息（级别颜色）
     )
@@ -95,6 +111,7 @@ def setup_loguru():
         enqueue=True,              # 异步写入队列，线程安全，不阻塞主线程
         backtrace=True,            # 捕获完整异常栈
         diagnose=True,             # 启用变量诊断，方便调试
+        # filter=lambda record: not is_url_log(record),  # 过滤掉URL日志
     )
 
     # ============= 文件输出配置（仅生产环境）==============
@@ -109,18 +126,33 @@ def setup_loguru():
         file_format = LOG_FORMAT.replace("<green>", "").replace("</green>", "") \
                                  .replace("<level>", "").replace("</level>", "") \
                                  .replace("<yellow>", "").replace("</yellow>", "") \
-                                 .replace("<cyan>", "").replace("</cyan>", "")
+                                 .replace("<cyan>", "").replace("</cyan>", "") \
+                                 .replace("<magenta>", "").replace("</magenta>", "")
 
         logger.add(
-            log_dir / "django_{time:YYYY-MM-DD}.log",  # 文件名按日期命名
+            log_dir / "debug_{time:YYYY-MM-DD}.log",  # 文件名按日期命名
             format=file_format,          # 无颜色的纯文本格式
             rotation="00:00",            # 轮转时机：每天零点创建新文件
             retention="30 days",         # 保留时间：30天，自动删除旧文件
             compression="zip",           # 轮转后自动压缩旧文件为 zip，节省空间
-            level="INFO",                # 文件只记录 INFO 及以上级别，避免太大
+            level="DEBUG",                # 文件只记录 INFO 及以上级别，避免太大
             encoding="utf-8",            # 编码 UTF-8，支持中文
             enqueue=True,                # 异步写入，线程安全
             backtrace=True,              # 异常栈完整
+            filter=lambda record: not is_url_log(record),  # 过滤掉URL日志
+        )
+
+        # ========== url.log：只记录请求URL日志 ==========
+        logger.add(
+            log_dir / "url_{time:YYYY-MM-DD}.log",
+            format=file_format,
+            rotation="00:00",
+            retention="30 days",
+            compression="zip",
+            level="DEBUG",  # URL日志通常是INFO级别
+            encoding="utf-8",
+            enqueue=True,
+            filter=lambda record: is_url_log(record),  # 只保留URL日志
         )
 
     # ============= 拦截所有原生 logging =============

@@ -14,7 +14,7 @@ channel.queue_declare(queue='hello2', durable=True, arguments={'x-queue-type': '
 # 3 向指定队列插入消息
 channel.basic_publish(exchange='',               # 简单模式
                       routing_key='hello2',      # 指定队列
-                      body='hello 2',            # 消息体
+                      body='info_hello 2',            # 消息体
                       # 消息持久化
                       properties=pika.BasicProperties(
                           delivery_mode=2,  # 2 表示持久化

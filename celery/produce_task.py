@@ -1,8 +1,10 @@
+from celery_tasks.task01 import send_email
+from celery_tasks.task02 import send_msg
 
-from celery_task import send_emali, send_meg
+print('开始')
 
-result = send_emali.delay("zhangsan")
-print('1', result.id)
+res = send_email.delay("小王")
+print(res)
 
-result2 = send_meg.delay("lisi")
-print('2', result2.id)
+res2 = send_msg.delay("小李")
+print(res2)

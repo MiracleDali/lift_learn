@@ -14,3 +14,18 @@ cel = Celery('celery_dome',      # celery 任务名称
 cel.conf.timezone = 'Asia/Shanghai'
 # 是否使用UTC时间
 cel.conf.enable_utc = False
+
+
+########################################################
+# 周期性任务
+cel.conf.beat_schedule = {
+    # 任务随意命名
+    'add_every_10_seconds': {
+        # 执行的任务
+        'task': 'celery_tasks.task01.send_email',
+        # 执行的时间间隔
+        'schedule': 6.0,
+        # 任务参数
+        'args': ('小王',)
+    },
+}
